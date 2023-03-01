@@ -20,7 +20,7 @@ def lambda_handler(event, context):
     if start_date <= check_date <= end_date:
 
         try:
-            s3_object = s3.Object("stock-cloud", "file.json").get()
+            s3_object = s3.Object("stock-cloud", f"{name}.json").get()
             file_content = json.loads(s3_object["Body"].read().decode("utf-8"))
         except:
             file_content = {
@@ -35,7 +35,7 @@ def lambda_handler(event, context):
         else:
             file_content["position"] = position + 1
 
-        s3.Object("stock-cloud", "file.json").put(Body=json.dumps(file_content))
+        s3.Object("stock-cloud", f"{name}.json").put(Body=json.dumps(file_content))
 
         return {
             'statusCode': 200,
@@ -58,7 +58,7 @@ def lambda_handler(event, context):
         }
 
         try:
-            s3_object = s3.Object("stock-cloud", "file.json").get()
+            s3_object = s3.Object("stock-cloud", f"{name}.json").get()
             file_content = json.loads(s3_object["Body"].read().decode("utf-8"))
         except:
             file_content = {
@@ -72,7 +72,7 @@ def lambda_handler(event, context):
         file_content["array"].append(stock)
 
         # Upload the modified file back to S3
-        s3.Object("stock-cloud", "file.json").put(Body=json.dumps(file_content))
+        s3.Object("stock-cloud", f"{name}.json").put(Body=json.dumps(file_content))
 
         return {
             'statusCode': 200,
