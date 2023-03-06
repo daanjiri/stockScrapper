@@ -2,7 +2,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import boto3
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def lambda_handler(event, context):
@@ -12,12 +12,17 @@ def lambda_handler(event, context):
 
     name = event['pathParameters']['symbol']
 
-    start_date = datetime(2023, 2, 19, 5, 0, 0)
-    end_date = datetime(2023, 2, 19, 23, 59, 59)
-
-    check_date = datetime.now()
+    start_date = datetime(2023, 3, 5, 0, 0, 0)
+    end_date = datetime(2023, 3, 5, 23, 59, 59)
+    
+    utc_now =  datetime.utcnow()
+    col_offset = timedelta(hours=-5) 
+    check_date = utc_now + col_offset
+    
+    print('fecha',check_date)
 
     if start_date <= check_date <= end_date:
+        print('entra-----------------------------------------------')
 
         try:
             s3_object = s3.Object("stock-cloud", f"{name}.json").get()
@@ -43,6 +48,7 @@ def lambda_handler(event, context):
         }
 
     else:
+        print('Else-entra-----------------------------------------------')
         url = f"https://www.marketwatch.com/investing/stock/{name}?mod=search_symbol"
         response = requests.get(url, headers={'Cache-Control': 'no-cache'})
         soup = BeautifulSoup(response.text, 'html.parser')
